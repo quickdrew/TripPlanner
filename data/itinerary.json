@@ -1,0 +1,30 @@
+[
+  {
+    "name": "Day 1",
+    "locations": [
+      {
+        "name": "London",
+        "lat": 51.505,
+        "lng": -0.09,
+        "time": ""
+      },
+      {
+        "name": "france",
+        "lat": 51.505,
+        "lng": -0.09,
+        "time": ""
+      }
+    ]
+  },
+  {
+    "name": "Day 2",
+    "locations": [
+      {
+        "name": "germanuy",
+        "lat": 51.505,
+        "lng": -0.09,
+        "time": ""
+      }
+    ]
+  }
+]

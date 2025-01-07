@@ -1,0 +1,14 @@
+[
+    {
+      "name": "Day 1",
+      "locations": [
+        {
+          "name": "Location Name",
+          "lat": 51.505,
+          "lng": -0.09,
+          "time": "12:00"
+        }
+      ]
+    }
+  ]
+  

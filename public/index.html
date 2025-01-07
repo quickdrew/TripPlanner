@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trip Planner</title>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+    <style>
+        body {
+            overflow-y: auto;
+            font-family: Arial, sans-serif;
+        }
+
+        #controls {
+            padding: 10px;
+        }
+
+        #map {
+            width: 100%;
+            height: 700px; /* Adjust height as needed */
+            margin-top: 10px;
+        }
+
+        #daysContainer {
+            display: flex; /* Enable horizontal layout */
+            gap: 10px; /* Space between days */
+            overflow-x: auto; /* Allow horizontal scrolling */
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
+
+        .day {
+            flex: 0 0 auto; /* Prevent shrinking */
+            width: 200px; /* Set a fixed width for each day */
+            border: 1px solid #ddd;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .day h3 {
+            text-align: center; /* Center-align day titles */
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="controls">
+        <input id="locationName" type="text" placeholder="Location Name" />
+        <input id="locationTime" type="time" />
+        <select id="daySelector">
+            <option value="">Select Day</option>
+        </select>
+        <button id="addLocation">Add Location</button>
+        <button id="addDay">Add Day</button>
+        <select id="travelMode">
+            <option value="driving" selected>Driving</option>
+            <option value="walking">Walking</option>
+            <option value="cycling">Cycling</option>
+            <option value="flying">Flying (straight lines)</option>
+            <option value="metro">Metro</option>
+        </select>        
+        <button id="savePlan">Save Plan</button>
+        <button id="loadPlan">Load Plan</button>
+    </div>
+    <div id="itinerary">
+        <h2>Itinerary</h2>
+        <div id="daysContainer"></div>
+    </div>   
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    <script src="script.js"></script> 
+</body>
+</html>
