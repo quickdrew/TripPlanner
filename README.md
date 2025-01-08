@@ -80,7 +80,7 @@ TRIP_PLANNER/
 ### Steps
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/quickdrew/TripPlanner.git
    ```
 
 2. Navigate to the project directory:
