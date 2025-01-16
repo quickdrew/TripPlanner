@@ -278,19 +278,42 @@ function loadPlan() {
     }
 
     fetch(`/load-plan/${encodeURIComponent(planName)}`)
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`Failed to load plan: ${res.statusText}`);
+            }
+            return res.json();
+        })
         .then(data => {
-            itinerary.length = 0; // Clear existing itinerary
+            if (!Array.isArray(data)) {
+                throw new Error("Invalid plan format: Expected an array of days.");
+            }
+
+            // Clear existing itinerary
+            itinerary.length = 0;
             daysContainer.innerHTML = "";
             daySelector.innerHTML = '<option value="">Select Day</option>';
 
             data.forEach((day, index) => {
+                if (!day.name || !day.color || !Array.isArray(day.locations)) {
+                    throw new Error(`Invalid day format at index ${index}: ${JSON.stringify(day)}`);
+                }
+
                 const loadedDay = { name: day.name, color: day.color, locations: [] };
 
                 day.locations.forEach(loc => {
+                    if (!loc.name || loc.lat == null || loc.lng == null) {
+                        throw new Error(`Invalid location format: ${JSON.stringify(loc)}`);
+                    }
+
                     const marker = new mapboxgl.Marker({ color: day.color })
                         .setLngLat([loc.lng, loc.lat])
-                        .setPopup(new mapboxgl.Popup().setHTML(`<strong>${loc.name}</strong><br>${loc.time || 'No time specified'}<br>Notes: ${loc.notes || 'None'}<br>Travel: ${loc.travelMode}`))
+                        .setPopup(new mapboxgl.Popup().setHTML(`
+                            <strong>${loc.name}</strong><br>
+                            ${loc.time || 'No time specified'}<br>
+                            Notes: ${loc.notes || 'None'}<br>
+                            Travel: ${loc.travelMode || 'N/A'}
+                        `))
                         .addTo(map);
 
                     loc.marker = marker;
@@ -298,16 +321,31 @@ function loadPlan() {
                 });
 
                 itinerary.push(loadedDay);
-                updateItinerary(index + 1);
-                drawRoute(index + 1);
+
+                // Add to the day selector
+                const option = document.createElement("option");
+                option.value = index + 1;
+                option.textContent = day.name;
+                daySelector.appendChild(option);
+
+                // Add to the days container
+                const dayDiv = document.createElement("div");
+                dayDiv.className = "day";
+                dayDiv.id = `day-${index + 1}`;
+                dayDiv.innerHTML = `<h3 style="color:${day.color}">${day.name}</h3><ul id="day-locations-${index + 1}"></ul>`;
+                daysContainer.appendChild(dayDiv);
+
+                updateItinerary(index + 1); // Populate itinerary
             });
 
             alert(`Plan "${planName}" loaded successfully!`);
         })
         .catch(err => {
-            alert("Error loading the plan.");
+            console.error("Error loading plan:", err);
+            alert(`Error loading the plan: ${err.message}`);
         });
 }
+
 
 
 // Event listeners
