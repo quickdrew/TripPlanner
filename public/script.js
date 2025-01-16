@@ -67,6 +67,7 @@ function addDay() {
 async function addLocation() {
     const name = document.getElementById("locationName").value;
     const time = document.getElementById("locationTime").value;
+    const notes = document.getElementById("locationNotes").value; // Capture notes
     const dayNumber = parseInt(daySelector.value);
     const travelMode = document.getElementById("travelMode").value; // Get selected travel mode
 
@@ -92,12 +93,12 @@ async function addLocation() {
         }
 
         const day = itinerary[dayNumber - 1];
-        const location = { name, time, lat, lng, travelMode };
+        const location = { name, time, notes, lat, lng, travelMode };
 
         // Add marker and store reference
         const marker = new mapboxgl.Marker({ color: day.color })
             .setLngLat([lng, lat])
-            .setPopup(new mapboxgl.Popup().setHTML(`<strong>${name}</strong><br>${time || 'No time specified'}<br>Travel: ${travelMode}`))
+            .setPopup(new mapboxgl.Popup().setHTML(`<strong>${name}</strong><br>${time || 'No time specified'}<br>Notes: ${notes || 'None'}<br>Travel: ${travelMode}`))
             .addTo(map);
 
         location.marker = marker; // Store marker in location object
@@ -110,6 +111,7 @@ async function addLocation() {
         alert("Failed to add location. Please try again.");
     }
 }
+
 
 
 
@@ -195,6 +197,7 @@ function updateItinerary(dayNumber) {
         locationItem.className = "location";
         locationItem.innerHTML = `
             ${loc.name} (${loc.lat.toFixed(4)}, ${loc.lng.toFixed(4)}) at ${loc.time || "No time specified"}<br>
+            Notes: ${loc.notes || "None"}<br>
             Travel: ${loc.travelMode || "N/A"}
             <button onclick="removeLocation(${dayNumber}, ${index})">Remove</button>
         `;
@@ -204,6 +207,7 @@ function updateItinerary(dayNumber) {
     // Update the route after sorting
     drawRoute(dayNumber);
 }
+
 
 
 // Make removeLocation accessible globally for dynamic buttons
@@ -244,11 +248,8 @@ function savePlan() {
     const saveData = itinerary.map(day => ({
         name: day.name,
         color: day.color,
-        locations: day.locations.map(({ name, lat, lng, time, travelMode }) => ({ name, lat, lng, time, travelMode })),
+        locations: day.locations.map(({ name, lat, lng, time, travelMode, notes }) => ({ name, lat, lng, time, travelMode, notes })),
     }));
-    
-
-    console.log("Saving plan:", planName, saveData);
 
     fetch(`/save-plan/${encodeURIComponent(planName)}`, {
         method: "POST",
@@ -259,15 +260,14 @@ function savePlan() {
             if (res.ok) {
                 alert(`Plan "${planName}" saved successfully!`);
             } else {
-                console.error("Error saving plan:", res);
                 alert("Error saving the plan.");
             }
         })
         .catch(err => {
-            console.error("Error during savePlan:", err);
             alert("Error saving the plan.");
         });
 }
+
 
 // Load a saved plan
 function loadPlan() {
@@ -286,46 +286,35 @@ function loadPlan() {
 
             data.forEach((day, index) => {
                 const loadedDay = { name: day.name, color: day.color, locations: [] };
-            
+
                 day.locations.forEach(loc => {
                     const marker = new mapboxgl.Marker({ color: day.color })
                         .setLngLat([loc.lng, loc.lat])
-                        .setPopup(new mapboxgl.Popup().setHTML(`<strong>${loc.name}</strong><br>${loc.time || 'No time specified'}<br>Travel: ${loc.travelMode}`))
+                        .setPopup(new mapboxgl.Popup().setHTML(`<strong>${loc.name}</strong><br>${loc.time || 'No time specified'}<br>Notes: ${loc.notes || 'None'}<br>Travel: ${loc.travelMode}`))
                         .addTo(map);
-            
+
                     loc.marker = marker;
                     loadedDay.locations.push(loc);
                 });
-            
+
                 itinerary.push(loadedDay);
                 updateItinerary(index + 1);
                 drawRoute(index + 1);
             });
-            
-        
 
             alert(`Plan "${planName}" loaded successfully!`);
         })
         .catch(err => {
-            console.error("Error loading plan:", err);
             alert("Error loading the plan.");
         });
 }
+
 
 // Event listeners
 document.getElementById("addDay").addEventListener("click", addDay);
 document.getElementById("addLocation").addEventListener("click", addLocation);
 document.getElementById("savePlan").addEventListener("click", savePlan);
 document.getElementById("loadPlan").addEventListener("click", loadPlan);
-
-// document.getElementById("scrollLeft").addEventListener("click", () => {
-//     document.getElementById("daysContainer").scrollBy({ left: -200, behavior: "smooth" });
-// });
-
-// document.getElementById("scrollRight").addEventListener("click", () => {
-//     document.getElementById("daysContainer").scrollBy({ left: 200, behavior: "smooth" });
-// });
-
 
 // Initialize the map
 initMap();
